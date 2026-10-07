@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHAN MINI BOT 💙 - Royal Terminal</title>
+<style>
+:root {
+  --bg: #000814;
+  --card: rgba(5, 20, 40, 0.85);
+  --accent-1: #00aaff;
+  --accent-2: #0066ff;
+  --accent-3: #00e5ff;
+  --muted: #8ab4d8;
+  --text: #e6f7ff;
+  --glass-border: rgba(0, 170, 255, 0.3);
+  --radius: 16px;
+  --success: #00ffcc;
+  --warning: #ffcc00;
+  --error: #ff3366;
+  --shadow: 0 0 30px rgba(0, 170, 255, 0.3);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Courier New', monospace;
+  background: var(--bg);
+  color: var(--text);
+  padding: 40px 20px;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(rgba(0,170,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,170,255,0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+#matrix { position: fixed; top: 0; left: 0; z-index: -1; }
+
+.scanline {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: #00aaff;
+  box-shadow: 0 0 10px #00aaff;
+  animation: scan 6s linear infinite;
+  z-index: 9999;
+  opacity: 0.5;
+  pointer-events: none;
+}
+@keyframes scan { 0%{top:0;} 100%{top:100vh;} }
+
+.container { width: 100%; max-width: 500px; z-index: 10; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow);
+  border-radius: var(--radius);
+  padding: 40px 30px;
+  backdrop-filter: blur(20px);
+}
+.card:hover {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 40px rgba(0,170,255,0.4);
+  animation: glitch 0.3s;
+}
+
+@keyframes glitch {
+ 0% {text-shadow: 0.05em 0 0 var(--accent-2), -0.05em -0.025em 0 var(--accent-3);}
+ 50% {text-shadow: -0.05em -0.025em 0 var(--accent-2), 0.025em 0.025em 0 var(--accent-3);}
+ 100% {text-shadow: 0.025em 0.05em 0 var(--accent-2), 0.05em 0 0 var(--accent-3);}
+}
+
+.logo {
+  text-align: center;
+  font-size: 50px;
+  margin-bottom: 10px;
+  filter: drop-shadow(0 0 15px var(--accent-1));
+}
+
+h1 {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 5px;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: neonGlow 2s infinite alternate;
+}
+
+@keyframes neonGlow {
+  from { text-shadow: 0 0 10px var(--accent-1); }
+  to { text-shadow: 0 0 20px var(--accent-2); }
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 25px;
+  font-size: 14px;
+}
+
+/* STATS */
+.stats { display: flex; gap: 15px; margin: 20px 0; }
+
+.stat-card {
+  flex: 1;
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 15px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* INPUT */
+.input-group { margin-bottom: 20px; }
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--accent-1);
+  font-size: 14px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 14px;
+  background: #000;
+  border: 1px solid var(--glass-border);
+  color: var(--accent-1);
+  font-family: 'Courier New';
+  font-size: 16px;
+  border-radius: 8px;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px rgba(0,170,255,0.3);
+}
+
+/* BUTTON */
+.btn {
+  width: 100%;
+  padding: 14px;
+  background: transparent;
+  border: 2px solid var(--accent-1);
+  color: var(--accent-1);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: 700;
+  font-size: 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn:hover {
+  background: var(--accent-1);
+  color: #000;
+  box-shadow: 0 0 20px var(--accent-1);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* CODE BOX */
+.code-box {
+  margin-top: 20px;
+  padding: 20px;
+  background: #000;
+  border: 1px dashed var(--accent-1);
+  border-radius: 8px;
+  text-align: center;
+  display: none;
+}
+
+.code-box.show { display: block; }
+
+.code-label {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.pairing-code {
+  font-size: 32px;
+  color: var(--accent-1);
+  letter-spacing: 8px;
+  text-shadow: 0 0 10px var(--accent-1);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.pairing-code.copied {
+  animation: flash 0.5s;
+}
+
+@keyframes flash {
+  0%,100%{color:var(--accent-1);}
+  50%{color:#fff;}
+}
+
+/* STATUS */
+.status {
+  margin-top: 15px;
+  padding: 12px;
+  border-radius: 8px;
+  border-left: 3px solid;
+  font-size: 14px;
+  display: none;
+}
+
+.status.show { display: block; }
+
+.status.success {
+  border-left-color: var(--success);
+  background: rgba(0,255,204,0.1);
+  color: var(--success);
+}
+
+.status.error {
+  border-left-color: var(--error);
+  background: rgba(255,51,102,0.1);
+  color: var(--error);
+}
+
+.status.warning {
+  border-left-color: var(--warning);
+  background: rgba(255,204,0,0.1);
+  color: var(--warning);
+}
+
+/* SPINNER */
+.spinner {
+  border: 3px solid rgba(0,170,255,0.2);
+  border-top-color: var(--accent-1);
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* MODAL */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.9);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.modal.active { opacity: 1; }
+
+.modal-content {
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  padding: 30px;
+  border-radius: var(--radius);
+  max-width: 400px;
+  text-align: center;
+  transform: scale(0.8);
+  transition: 0.3s;
+}
+
+.modal.active .modal-content { transform: scale(1); }
+
+#modalClose {
+  float: right;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--error);
+}
+
+#channelLink {
+  display:block;
+  padding:12px;
+  margin:15px 0;
+  border:1px solid #00aaff;
+  color:#00aaff;
+  text-decoration:none;
+  border-radius:8px;
+  font-weight:700;
+}
+
+#channelLink:hover {
+  box-shadow: 0 0 20px #00aaff;
+}
+
+/* EFFECTS */
+.ripple {
+  position:absolute;
+  border-radius:50%;
+  background:rgba(0,170,255,0.6);
+  transform:scale(0);
+  animation:ripple 0.6s linear;
+  pointer-events:none;
+}
+
+@keyframes ripple {
+  to { transform: scale(4); opacity: 0; }
+}
+
+@keyframes shake {
+  0%,100%{transform:translateX(0);}
+  25%{transform:translateX(-10px);}
+  75%{transform:translateX(10px);}
+}
+</style>
+</head>
+
+<body>
+<div class="scanline"></div>
+
+<div class="container">
+  <div class="card">
+    <div class="logo">💙</div>
+    <h1>SHAN MINI BOT 💙</h1>
+    <p class="subtitle">SHAN MINI BOT • PAIRING TERMINAL v2.0</p>
+
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-value" id="activeSockets">0</div>
+        <div class="stat-label">ONLINE</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="totalUsers">0</div>
+        <div class="stat-label">TOTAL USERS</div>
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>> ENTER WHATSAPP NUMBER</label>
+      <input id="phone" type="tel" placeholder="94771234567" maxlength="12">
+    </div>
+
+    <button class="btn" id="requestPairing">GENERATE CODE</button>
+
+    <div class="code-box" id="codeBox">
+      <div class="code-label">YOUR PAIRING CODE</div>
+      <div class="pairing-code" id="pairingCode">----</div>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+</div>
+
+<!-- CHANNEL MODAL -->
+<div id="channelModal" class="modal">
+  <div class="modal-content">
+    <span id="modalClose">X</span>
+    <h2>💙 [SHAN MINI BOT]</h2>
+    <p>Bot එක use කරන්න කලින් channel එක follow කරන්න</p>
+    <a id="channelLink" target="_blank"></a>
+    <button id="confirmFollow" class="btn">I FOLLOWED</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const socket = io();
+
+  const CHANNEL_LINK = {
+    name: "💙 SHAN MINI BOT",
+    url: "https://whatsapp.com/channel/0029Vb8pc2E0QeahdPemsB2r"
+  };
+
+  const canvas = document.createElement('canvas');
+  canvas.id = 'matrix';
+  document.body.prepend(canvas);
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    columns = Math.floor(canvas.width / fontSize);
+    drops = Array(columns).fill(1);
+  });
+
+  const chars = "01アイウエオカキクケコサシスセソタチツテトSHANMINIBOT";
+  const fontSize = 14;
+  let columns = Math.floor(canvas.width / fontSize);
+  let drops = Array(columns).fill(1);
+
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0,8,20,0.05)';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+
+    ctx.fillStyle = '#00aaff';
+    ctx.font = fontSize + 'px Courier New';
+
+    for(let i=0; i<drops.length; i++) {
+      const text = chars[Math.floor(Math.random()*chars.length)];
+      ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+
+      if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
+        drops[i]=0;
+
+      drops[i]++;
+    }
+  }
+
+  setInterval(drawMatrix, 35);
+
+  const title = document.querySelector('h1');
+
+  if(title){
+    const txt = title.textContent;
+    title.textContent = '';
+    title.style.borderRight = '2px solid #00aaff';
+
+    let i = 0;
+
+    const type = setInterval(() => {
+      title.textContent += txt[i];
+      i++;
+
+      if(i >= txt.length) {
+        clearInterval(type);
+        title.style.borderRight = 'none';
+      }
+    }, 80);
+  }
+
+  const phoneInput = document.getElementById("phone");
+  const requestPairingBtn = document.getElementById("requestPairing");
+  const statusEl = document.getElementById("status");
+  const codeBox = document.getElementById("codeBox");
+  const channelModal = document.getElementById("channelModal");
+  const modalClose = document.getElementById("modalClose");
+  const confirmFollowBtn = document.getElementById("confirmFollow");
+  const channelLinkBox = document.getElementById("channelLink");
+
+  let channelsFollowed =
+    localStorage.getItem('channelsFollowed') === 'true';
+
+  if(channelLinkBox) {
+    channelLinkBox.href = CHANNEL_LINK.url;
+    channelLinkBox.innerHTML = `> ${CHANNEL_LINK.name}`;
+  }
+
+  if (!channelsFollowed && channelModal) {
+    setTimeout(() => {
+      channelModal.style.display = 'flex';
+
+      setTimeout(() =>
+        channelModal.classList.add('active'), 10);
+
+    }, 1500);
+  }
+
+  function closeModal() {
+    channelModal.classList.remove('active');
+
+    setTimeout(() => {
+      channelModal.style.display = 'none';
+    }, 300);
+  }
+
+  modalClose.addEventListener('click', closeModal);
+
+  channelModal.addEventListener('click', (e) => {
+    if (e.target === channelModal) closeModal();
+  });
+
+  confirmFollowBtn.addEventListener('click', () => {
+    channelsFollowed = true;
+    localStorage.setItem('channelsFollowed', 'true');
+    closeModal();
+
+    showStatus(
+      `[ACCESS GRANTED] ✅ Channel Followed`,
+      "success"
+    );
+
+    playBeep(800);
+  });
+
+  socket.on("statsUpdate", ({ activeSockets, totalUsers }) => {
+    animateNumber("activeSockets", activeSockets);
+    animateNumber("totalUsers", totalUsers);
+  });
+
+  function animateNumber(id, target) {
+    const el = document.getElementById(id);
+
+    let current = parseInt(el.textContent) || 0;
+    const step = (target - current) / 10;
+
+    const interval = setInterval(() => {
+      current += step;
+
+      if(
+        (step > 0 && current >= target) ||
+        (step < 0 && current <= target)
+      ) {
+        current = target;
+        clearInterval(interval);
+      }
+
+      el.textContent = Math.floor(current);
+
+    }, 30);
+  }
+
+  requestPairingBtn.addEventListener("click", function(e) {
+
+    let ripple = document.createElement("span");
+    ripple.className = "ripple";
+
+    const rect = this.getBoundingClientRect();
+
+    ripple.style.width =
+      ripple.style.height =
+      Math.max(rect.width, rect.height) + 'px';
+
+    ripple.style.left =
+      e.clientX - rect.left -
+      ripple.offsetWidth/2 + 'px';
+
+    ripple.style.top =
+      e.clientY - rect.top -
+      ripple.offsetHeight/2 + 'px';
+
+    this.appendChild(ripple);
+
+    setTimeout(() => ripple.remove(), 600);
+
+    playBeep(600);
+  });
+
+  requestPairingBtn.addEventListener("click", async () => {
+
+    if (!channelsFollowed) {
+      shakeElement(requestPairingBtn);
+
+      showStatus(
+        `[ERROR] ⚠️ Follow channel first`,
+        "warning"
+      );
+
+      channelModal.classList.add('active');
+
+      playBeep(300);
+      return;
+    }
+
+    const number = phoneInput.value.trim();
+
+    if (!number)
+      return showStatus(
+        "[ERROR] Enter phone number",
+        "error"
+      );
+
+    showStatus(
+      "<span class='spinner'></span> [CONNECTING...]",
+      "loading"
+    );
+
+    requestPairingBtn.disabled = true;
+    codeBox.classList.remove('show');
+
+    try {
+
+      const res = await fetch("/api/pair", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          number,
+          socketId: socket.id
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok)
+        throw new Error(data.error);
+
+      const code = data.pairingCode;
+      const spacedCode = code.split("").join(" ");
+
+      codeBox.classList.add('show');
+
+      document.getElementById("pairingCode")
+        .textContent = spacedCode;
+
+      showStatus(
+        `[CODE GENERATED] ✅ Click code to copy`,
+        "success"
+      );
+
+      playBeep(1000);
+
+      document.getElementById("pairingCode").onclick = (e) => {
+
+        navigator.clipboard.writeText(code);
+
+        e.target.classList.add("copied");
+
+        setTimeout(() =>
+          e.target.classList.remove("copied"),
+          1000
+        );
+
+        showStatus(
+          `[COPIED] ${code}`,
+          "success"
+        );
+      }
+
+    } catch (err) {
+
+      shakeElement(statusEl);
+
+      showStatus(
+        "[ERROR] " + err.message,
+        "error"
+      );
+
+      playBeep(200);
+
+    } finally {
+
+      requestPairingBtn.disabled = false;
+
+    }
+  });
+
+  function showStatus(message, type = "") {
+    statusEl.innerHTML = `> ${message}`;
+    statusEl.className = "status show " + type;
+  }
+
+  function shakeElement(el) {
+    el.style.animation = 'shake 0.5s';
+
+    setTimeout(() =>
+      el.style.animation = '',
+      500
+    );
+  }
+
+  socket.on("connected", ({ number }) => {
+
+    showStatus(
+      `[LINKED] ✅ Session: ${number}`,
+      "success"
+    );
+
+    confetti();
+    playBeep(1200);
+
+  });
+
+  function confetti() {
+
+    for(let i=0; i<30; i++){
+
+      let c = document.createElement("div");
+
+      c.style.cssText =
+        `position:fixed;
+         width:10px;
+         height:10px;
+         top:-10px;
+         left:${Math.random()*100}%;
+         background:${Math.random() > 0.5 ?
+         '#00aaff' : '#0066ff'};
+         animation:confettiFall 2s linear forwards;
+         z-index:9999;
+         pointer-events:none;`;
+
+      c.style.animationDelay =
+        Math.random()*0.5 + "s";
+
+      document.body.appendChild(c);
+
+      setTimeout(() =>
+        c.remove(),
+        2000
+      );
+    }
+  }
+
+  const style = document.createElement('style');
+
+  style.innerHTML =
+    `@keyframes confettiFall {
+      to {
+        transform: translateY(100vh) rotate(720deg);
+        opacity:0;
+      }
+    }`;
+
+  document.head.appendChild(style);
+
+  function playBeep(freq) {
+
+    try {
+
+      const audioCtx =
+        new (window.AudioContext ||
+        window.webkitAudioContext)();
+
+      const osc =
+        audioCtx.createOscillator();
+
+      osc.type = 'square';
+
+      osc.frequency.setValueAtTime(
+        freq,
+        audioCtx.currentTime
+      );
+
+      osc.connect(audioCtx.destination);
+
+      osc.start();
+
+      osc.stop(
+        audioCtx.currentTime + 0.1
+      );
+
+    } catch(e){}
+  }
+
+  phoneInput.addEventListener("keypress", (e) => {
+
+    if (e.key === "Enter")
+      requestPairingBtn.click();
+
+  });
+
+});
+</script>
+</body>
+  </html>
